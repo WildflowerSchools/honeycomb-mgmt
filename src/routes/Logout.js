@@ -2,20 +2,13 @@ import { withRouter } from 'react-router-dom';
 import React, { Component } from 'react';
 import { Container, Row, Col } from "react-bootstrap";
 
-// import './Home.css';
-
-class Home extends Component {
+class Logout extends Component {
   render() {
     return (
         <Container fluid="true">
             <Row>
                 <Col>
-                    <h2>Honeycomb</h2>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <p>TODO - add something here</p>
+                    <h2>Bye now! <span role="img" aria-label="Hand waving">👋</span></h2>
                 </Col>
             </Row>
         </Container>
@@ -23,4 +16,4 @@ class Home extends Component {
   }
 }
 
-export default withRouter(Home);
+export default withRouter(Logout);

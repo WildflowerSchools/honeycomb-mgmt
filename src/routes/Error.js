@@ -2,20 +2,18 @@ import { withRouter } from 'react-router-dom';
 import React, { Component } from 'react';
 import { Container, Row, Col } from "react-bootstrap";
 
-// import './Home.css';
-
-class Home extends Component {
+class Error extends Component {
   render() {
     return (
         <Container fluid="true">
             <Row>
                 <Col>
-                    <h2>Honeycomb</h2>
+                    <h2>Error { this.props.error }</h2>
                 </Col>
             </Row>
             <Row>
                 <Col>
-                    <p>TODO - add something here</p>
+                    <p></p>
                 </Col>
             </Row>
         </Container>
@@ -23,4 +21,4 @@ class Home extends Component {
   }
 }
 
-export default withRouter(Home);
+export default withRouter(Error);

@@ -1,7 +1,8 @@
+import { withRouter, Link } from 'react-router-dom';
 import React from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
-import { Container, Row, Col, Table, ButtonGroup, Button, Modal, Form } from "react-bootstrap";
+import { Container, Row, Col, Table, ButtonGroup, Button, Modal, Form, Breadcrumb } from "react-bootstrap";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClone, faEdit, faMinusSquare } from '@fortawesome/free-solid-svg-icons'
@@ -52,6 +53,18 @@ query getEnvironment($environment_id: ID!) {
 
 
 class Environments extends React.Component {
+
+    constructor(props, context) {
+        super(props, context);
+        this.app = props.app;
+        this.auth = props.app.auth;
+        this.router = context.router;
+
+        this.state = {
+            isAuthenticated: this.auth.isAuthenticated(),
+        };
+    }
+
   render() {
     return (
         <Container fluid="true">
@@ -105,7 +118,17 @@ class EnvironmentsList extends React.Component {
 
     render() {
         return (
-            <>
+          <React.Fragment>
+            <Container fluid>
+                <Row>
+                  <Col>
+                    <Breadcrumb>
+                      <Breadcrumb.Item href="#/environments">Environments</Breadcrumb.Item>
+                      <Breadcrumb.Item active>this</Breadcrumb.Item>
+                    </Breadcrumb>
+                  </Col>
+                </Row>
+            </Container>
             <Table striped bordered hover size="sm">
               <thead>
                 <tr>
@@ -119,7 +142,7 @@ class EnvironmentsList extends React.Component {
                 {this.props.environments.map((environment) => {
                 return (
                     <tr key={environment.environment_id}>
-                        <td>{environment.name}</td>
+                        <td><Link to={ `/environments/environment/${environment.environment_id}` }>{environment.name}</Link></td>
                         <td>{environment.description}</td>
                         <td>{environment.system.created}</td>
                         <td>
@@ -154,7 +177,7 @@ class EnvironmentsList extends React.Component {
                   </Query>
               </Modal.Body>
             </Modal>
-            </>
+          </React.Fragment>
         )
     }
 }
@@ -218,5 +241,4 @@ class EnvironmentEditForm extends React.Component {
     }
 }
 
-
-export default Environments;
+export default withRouter(Environments);
