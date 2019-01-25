@@ -29,7 +29,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "pretty": "node_modules/.bin/prettier --no-semi --no-bracket-spacing --end-of-line lf --write --single-quote --trailing-comma es5 --insert-pragma \"src/**/*.js\""
   },
   "eslintConfig": {
     "extends": "react-app"
