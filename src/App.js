@@ -22,10 +22,24 @@ import Error from './routes/Error'
 import Logout from './routes/Logout'
 import Environments from './routes/Environments/Environments'
 import EnvironmentDetail from './routes/Environments/EnvironmentDetail'
+import { SensorVisualizer } from './routes/Environments/Sensors/Vis'
 import Auth from './Auth/Auth'
 
 import './App.css'
 import logo from './logo.svg'
+
+import {ApolloProvider} from 'react-apollo'
+import {ApolloClient} from 'apollo-client'
+import {HttpLink} from 'apollo-link-http'
+import {InMemoryCache} from 'apollo-cache-inmemory'
+
+
+const cache = new InMemoryCache()
+
+const HONEYCOMB_URL = 'https://honeycomb.api.wildflower-tech.org/graphql'
+// const HONEYCOMB_URL = 'http://localhost:4000/graphql'
+
+
 
 const auth = new Auth()
 
@@ -53,12 +67,32 @@ class App extends Component {
     auth.app = this
     this.auth = auth
 
+    this.client = new ApolloClient({
+      link: new HttpLink({uri: HONEYCOMB_URL}),
+      cache,
+    })
+    this.resetClient()
+
     this.state = {
       isAuthenticated: auth.isAuthenticated(),
     }
   }
 
+  resetClient() {
+    console.log(`client resetting ${this.auth.isAuthenticated()} ${this.auth.getAccessToken()}`)
+    var httpLink = new HttpLink({
+      uri: HONEYCOMB_URL,
+      headers: {
+        Authorization: this.auth.isAuthenticated() ? `Bearer ${this.auth.getAccessToken()}` : "",
+      },
+    })
+    this.client.link = httpLink
+    this.client.resetStore()
+    console.log(this.client)
+  }
+
   authChanged(auth) {
+    this.resetClient()
     this.setState({isAuthenticated: auth.isAuthenticated()})
   }
 
@@ -119,7 +153,7 @@ class App extends Component {
                   </React.Fragment>
                 )}
                 {this.state.isAuthenticated && (
-                  <React.Fragment>
+                  <ApolloProvider client={this.client}>
                     <Route
                       path="/home"
                       exact
@@ -147,7 +181,12 @@ class App extends Component {
                       exact
                       render={props => <EnvironmentDetail app={this} />}
                     />
-                  </React.Fragment>
+                    <Route
+                      path="/environments/environment/:environmentId/sensors"
+                      exact
+                      render={props => <SensorVisualizer app={this} />}
+                    />
+                  </ApolloProvider>
                 )}
               </Col>
             </Row>

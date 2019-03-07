@@ -14,7 +14,7 @@ export default class Auth {
     clientID: AUTH_CONFIG.clientId,
     redirectUri: AUTH_CONFIG.callbackUrl,
     responseType: 'token id_token',
-    scope: 'openid',
+    audience: 'https://honeycomb.api.wildflowerschools.org',
   })
 
   constructor() {
@@ -25,7 +25,7 @@ export default class Auth {
     this.getAccessToken = this.getAccessToken.bind(this)
     this.getIdToken = this.getIdToken.bind(this)
     this.renewSession = this.renewSession.bind(this)
-
+    this.expiresAt = 0
     window._auth = this
   }
 
@@ -36,7 +36,6 @@ export default class Auth {
   handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
-        console.log('HELLO!!')
         this.setSession(authResult)
       } else if (err) {
         window.location.replace('#/login-error')
@@ -59,6 +58,7 @@ export default class Auth {
 
     // Set the time that the access token will expire at
     let expiresAt = authResult.expiresIn * 1000 + new Date().getTime()
+    console.log(authResult)
     this.accessToken = authResult.accessToken
     this.idToken = authResult.idToken
     this.expiresAt = expiresAt
@@ -71,7 +71,11 @@ export default class Auth {
     this.auth0.checkSession({}, (err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult)
-        window.location.replace(forwardPath)
+        if(forwardPath) {
+          window.location.replace(forwardPath)
+        } else {
+          window.location.replace('#/home')
+        }
       } else if (err) {
         // this.logout();
         console.log(err)

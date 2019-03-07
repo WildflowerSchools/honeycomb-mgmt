@@ -2,7 +2,6 @@
 
 import {withRouter, Link} from 'react-router-dom'
 import React from 'react'
-import gql from 'graphql-tag'
 import {Query} from 'react-apollo'
 import {
   Container,
@@ -17,50 +16,12 @@ import {
 } from 'react-bootstrap'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faClone, faEdit, faMinusSquare} from '@fortawesome/free-solid-svg-icons'
+import {faClone, faEdit, faMinusSquare, faCubes} from '@fortawesome/free-solid-svg-icons'
 
 import './Environments.css'
 
-const LOAD_ENVIRONMENTS = gql`
-  {
-    environments {
-      data {
-        name
-        environment_id
-        description
-        system {
-          created
-          last_modified
-        }
-      }
-    }
-  }
-`
+import {LOAD_ENVIRONMENTS, LOAD_ENVIRONMENT} from "./Queries"
 
-const LOAD_ENVIRONMENT = gql`
-  query getEnvironment($environment_id: ID!) {
-    getEnvironment(environment_id: $environment_id) {
-      environment_id
-      name
-      description
-      location
-      assignments {
-        assignment_id
-        assigned_type
-        assigned {
-          ... on Device {
-            name
-            device_id
-          }
-          ... on Person {
-            name
-            person_id
-          }
-        }
-      }
-    }
-  }
-`
 
 class Environments extends React.Component {
   constructor(props, context) {
@@ -85,13 +46,18 @@ class Environments extends React.Component {
         <Row>
           <Col>
             <Query query={LOAD_ENVIRONMENTS}>
-              {({data, loading}) => {
-                if (loading || !data) {
-                  return <div>Loading ...</div>
+              {({data, loading, error}) => {
+                console.log("loading the environments?")
+                if(error) {
+                  console.log(error)
+                  return <div>Error: {error.message}</div>
+                } else if (loading || !data) {
+                  return (<div className="spinner-border" role="status"><span className="sr-only">Loading...</span></div>)
+                } else if (data) {
+                  return (
+                    <EnvironmentsList environments={data.environments.data} />
+                  )
                 }
-                return (
-                  <EnvironmentsList environments={data.environments.data} />
-                )
               }}
             </Query>
           </Col>
@@ -128,7 +94,6 @@ class EnvironmentsList extends React.Component {
       show: true,
       environment_id: {environment_id: environment_id},
     })
-    // this.handleShow()
   }
 
   render() {
@@ -141,7 +106,6 @@ class EnvironmentsList extends React.Component {
                 <Breadcrumb.Item href="#/environments">
                   Environments
                 </Breadcrumb.Item>
-                <Breadcrumb.Item active>this</Breadcrumb.Item>
               </Breadcrumb>
             </Col>
           </Row>
@@ -186,6 +150,15 @@ class EnvironmentsList extends React.Component {
                       <Button variant="outline-secondary" disabled>
                         <FontAwesomeIcon icon={faMinusSquare} />
                       </Button>
+                      <Button variant="outline-secondary">
+                      <Link
+                        to={`/environments/environment/${
+                          environment.environment_id
+                        }/sensors`}
+                      >
+                        <FontAwesomeIcon icon={faCubes} />
+                    </Link>
+                      </Button>
                     </ButtonGroup>
                   </td>
                 </tr>
@@ -204,7 +177,7 @@ class EnvironmentsList extends React.Component {
             >
               {({data, error, loading}) => {
                 if (loading || !data) {
-                  return <div>Loading ...</div>
+                  return (<div className="spinner-border" role="status"><span className="sr-only">Loading...</span></div>)
                 }
                 if (error) {
                   return `Error!: ${error}`
