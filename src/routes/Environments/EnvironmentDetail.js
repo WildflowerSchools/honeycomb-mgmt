@@ -347,7 +347,7 @@ class AssignmentDetail extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.assignment.assigned.confgurations.map(function(
+                {this.state.assignment.assigned.configurations.map(function(
                   configuration
                 ) {
                   return (

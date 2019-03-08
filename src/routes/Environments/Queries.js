@@ -17,7 +17,7 @@ const LOAD_ENVIRONMENT = gql`
             name
             device_id
             part_number
-            confgurations(current: true) {
+            configurations(current: true) {
               start
               end
               properties {
@@ -87,7 +87,7 @@ query getEnv($environment_id: ID!) {
           name
           device_id
           part_number
-          confgurations(current: true, page: {max: 1, sort: [{field: "start", direction: DESC}]}) {
+          configurations(current: true, page: {max: 1, sort: [{field: "start", direction: DESC}]}) {
             properties {
               name
               value

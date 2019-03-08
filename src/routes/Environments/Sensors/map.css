@@ -32,3 +32,16 @@
     border-radius: 8px;
     pointer-events: none;
 }
+
+.negSpaceGroup {
+    stroke: #000;
+    stroke-width: 4;
+}
+.negSpace {
+    fill: url(#diagonalHatch);
+}
+
+.posSpace {
+    fill: #ccf;
+    fill-opacity: 0.3;
+}
