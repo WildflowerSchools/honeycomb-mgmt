@@ -2,12 +2,6 @@ import React, {Component} from 'react';
 import './map.css'
 import * as d3 from "d3";
 
-import { Query } from "react-apollo";
-
-import {
-  OBSERVER_DATA_FOR_RANGE,
-} from "../Queries";
-
 
 class Map extends Component {
     datapoints = []
@@ -20,29 +14,20 @@ class Map extends Component {
 
         this.observations = this.prepareAssignmentData(props.assignments)
 
-        this.spaces = [
-            {
-                name: "work-area",
-                rect: [ 0, 0, 2044, 4058],
-            },
-            {
-                name: "couch-area",
-                rect: [ 2044, 0, 2017, 2713],
-            },
-            {
-                name: "kitchen-area",
-                rect: [ 4061, 0, 2044, 3000],
-            }
-        ]
-
+        this.layouts = props.layouts
+        this.spaces = this.things = []
+        if(this.layouts) {
+            this.spaces = this.layouts[0].spaces
+            this.things = this.layouts[0].objects
+        }
 
         this.x_domain = [
             0,
-            d3.max(this.spaces, space => { return space.rect[0] + space.rect[2] }),
+            d3.max(this.spaces, space => { return space.x + space.width }),
         ]
         this.y_domain = [
             0,
-            d3.max(this.spaces, space => { return space.rect[1] + space.rect[3] }),
+            d3.max(this.spaces, space => { return space.y + space.height }),
         ]
         this.x_scale = d3.scaleLinear()
             .domain(this.x_domain)
@@ -88,12 +73,11 @@ class Map extends Component {
                     return result
                 }
             }
+            return []
         })
     }
 
     render() {
-        const self = this
-        console.log(this.state.assignments)
         return (<div id={this.props.id}></div>)
     }
 
@@ -147,13 +131,13 @@ class Map extends Component {
             .enter()
             .append("rect")
                 .attr("class", "open")
-                .attr("x", (d) => { return this.x_scale(d.rect[0]) })
-                .attr("y", (d) => { return this.y_scale(d.rect[1]) })
-                .attr("width", (d) => { return this.x_scale(d.rect[2]) })
-                .attr("height", (d) => { return this.y_scale(d.rect[3]) })
+                .attr("x", (d) => { return this.x_scale(d.x) })
+                .attr("y", (d) => { return this.y_scale(d.y) })
+                .attr("width", (d) => { return this.x_scale(d.width) })
+                .attr("height", (d) => { return this.y_scale(d.height) })
                 .attr("fill", "black")
 
-        var negSpace = this.svg.append("g")
+        this.svg.append("g")
             .attr("class", "negSpaceGroup")
             .append("rect")
                 .attr("fill", "url(#diagonalHatch)")
@@ -170,10 +154,35 @@ class Map extends Component {
                 .data(this.spaces)
                 .enter()
                 .append("rect")
-                    .attr("x", (d) => { return this.x_scale(d.rect[0]) })
-                    .attr("y", (d) => { return this.y_scale(d.rect[1]) })
-                    .attr("width", (d) => { return this.x_scale(d.rect[2]) })
-                    .attr("height", (d) => { return this.y_scale(d.rect[3]) })
+                    .attr("x", (d) => { return this.x_scale(d.x) })
+                    .attr("y", (d) => { return this.y_scale(d.y) })
+                    .attr("width", (d) => { return this.x_scale(d.width) })
+                    .attr("height", (d) => { return this.y_scale(d.height) })
+
+        var thing = this.svg.selectAll("g.thing")
+            .data(this.things)
+            .enter()
+            .append("g")
+                .attr("class", "thing")
+
+        thing.append("rect")
+            .attr("x", (d) => { return this.x_scale(d.x) })
+            .attr("y", (d) => { return this.y_scale(d.y) })
+            .attr("width", (d) => { return this.x_scale(d.width) })
+            .attr("height", (d) => { return this.y_scale(d.height) })
+
+        var label = thing.append("text")
+            .text((d) => { return d.name })
+
+            label.attr("x", (d, i) => {
+                var box = label.nodes()[i].getBBox()
+                return this.x_scale(d.x) + ((this.x_scale(d.width)/2) - (box.width/2))
+            })
+            label.attr("y", (d, i) => {
+                var box = label.nodes()[i].getBBox()
+                return this.x_scale(d.y) + ((this.x_scale(d.height)/2) - (box.height/2))
+            })
+
     }
 
     drawObservations() {
@@ -246,9 +255,9 @@ class Map extends Component {
 
 
 function asType(val, typ) {
-    if(typ == "INT" || typ == "FLOAT") return Number(val)
-    if(typ == "BOOL") return val && val.toLowerCase() == "true"
-    if(typ == "NULL") return null
+    if(typ === "INT" || typ === "FLOAT") return Number(val)
+    if(typ === "BOOL") return val && val.toLowerCase() === "true"
+    if(typ === "NULL") return null
     return val
 }
 

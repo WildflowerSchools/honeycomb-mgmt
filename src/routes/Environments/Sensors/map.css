@@ -45,3 +45,13 @@
     fill: #ccf;
     fill-opacity: 0.3;
 }
+
+.thing rect {
+    fill: url(#diagonalHatch);
+    fill-opacity: 0.2;
+}
+
+.thing text {
+    font: italic 14px serif;
+    fill: #555;
+}

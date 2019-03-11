@@ -72,7 +72,7 @@ class SensorVisualizer extends React.Component {
                           <Col>
                             <Tabs defaultActiveKey="map2d" id="uncontrolled-tab-example">
                               <Tab eventKey="map2d" title="Sensor Map 2D">
-                                <Map id="roomMap" assignments={data.getEnvironment.assignments} app={this.app} />
+                                <Map id="roomMap" assignments={data.getEnvironment.assignments} layouts={data.getEnvironment.layouts} app={this.app} />
                               </Tab>
                               <Tab eventKey="map3d" title="Sensor Map 3D">
                                 <p>hello</p>

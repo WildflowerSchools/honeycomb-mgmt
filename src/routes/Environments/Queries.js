@@ -71,6 +71,23 @@ const ASSIGNMENTS = gql`
 query getEnv($environment_id: ID!) {
   getEnvironment(environment_id: $environment_id) {
     name
+    layouts(current: true) {
+      layout_id
+      spaces {
+        name
+        x
+        y
+        width
+        height
+      }
+      objects {
+        name
+        x
+        y
+        width
+        height
+      }
+    }
     assignments(current: true) {
       assignment_id
       assigned_type
